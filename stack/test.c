@@ -8,7 +8,6 @@ push(DATA val)
   tail=tail->next;
   tail->data=0;
   tail->next=0;
-  
 }
 DATA pop()
 {
