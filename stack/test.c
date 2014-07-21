@@ -1,26 +1,48 @@
+#define MAX_stack 10
 typedef int DATA;
 typedef struct stack{DATA data;struct stack *next;}stack;
-stack *head,*tail;
-push(DATA val)
+stack *head[MAX_stack],*tail[MAX_stack];
+void push(int index,DATA val)
 {
-  tail->data=val;
-  tail->next=(stack *)malloc(sizeof(stack));
-  tail=tail->next;
-  tail->data=0;
-  tail->next=0;
+  stack *p=head[index];
+  head[index]=(stack *)malloc(sizeof(stack));
+  head[index]->data=val;
+  head[index]->next=p;
 }
-DATA pop()
+DATA pop(int index)
 {
-  stack *p=head;
-  DATA result=head->data;
-  head=head->next;
+  stack *p=head[index];
+  DATA result=head[index]->data;
+  head[index]=head[index]->next;
   free(p);
   return result;
 }
-init()
+int isEmpty(int index)
 {
-  head=(stack *)malloc(sizeof(stack));
-  head->data=0;
-  head->next=0;
-  tail=head;
+  return !head[index];
+}
+void init(int index)
+{
+  head[index]=(stack *)malloc(sizeof(stack));
+  head[index]->data=0;
+  head[index]->next=0;
+  tail[index]=head[index];
+}
+void destroy(int index)
+{
+  for(;!isEmpty(index);)pop(index);
+}
+stack *find(int index,DATA val)
+{
+  stack *p=head[index];
+  for(;p;p=p->next)if(p->data==val)return p;
+  return 0;
+}
+main()
+{
+  init(0);
+  push(0,1);push(0,2);push(0,3);
+  printf("%d\n",pop(0));
+  printf("%d\n",pop(0));
+  printf("%d\n",pop(0));
 }
