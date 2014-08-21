@@ -42,11 +42,11 @@ int hCompare(Heap *h,hDATA p,hDATA q)
 {
   if(h->heap_type==MAX_HEAP)
   {
-    return p>q?1:0;
+    return p>q;
   }
   else //MIN_HEAP
   {
-    return p<q?1:0;
+    return p<q;
   }
 }
 void hPercolateDown(Heap *h, int i)
@@ -90,19 +90,9 @@ int hInsert(Heap *h, hDATA data)
   int i;
   if(h->count==h->capacity)ResizeHeap(h);
   h->count++;
-  if(h->heap_type==MAX_HEAP)
+  for(i=h->count-1;i>0&&hCompare(h,data,h->arr[(i-1)/2]);i=(i-1)/2)
   {
-    for(i=h->count-1;i>=0&&data>h->arr[(i-1)/2];i=(i-1)/2)
-    {
-      h->arr[i]=h->arr[(i-1)/2];
-    }
-  }
-  else
-  {
-    for(i=h->count-1;i>=0&&data<h->arr[(i-1)/2];i=(i-1)/2)
-    {
-      h->arr[i]=h->arr[(i-1)/2];
-    }
+    h->arr[i]=h->arr[(i-1)/2];
   }
   h->arr[i]=data;
 }
