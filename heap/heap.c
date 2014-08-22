@@ -1,4 +1,4 @@
-typedef struct a{int x;double y;} hDATA;
+typedef int hDATA;
 typedef struct Heap{
   hDATA *arr;
   int count;
