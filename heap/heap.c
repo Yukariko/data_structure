@@ -71,12 +71,15 @@ void UpHeap(Heap *h, int i)
   }
   h->arr[i]=data;
 }
-void hDelete(Heap *h)
+hDATA hDelete(Heap *h)
 {
-  if(h->count==0)return;
+  hDATA data={0};
+  if(h->count==0)return data;
+  data=h->arr[0];
   h->arr[0]=h->arr[h->count-1];
   h->count--;
   DownHeap(h,0);
+  return data;
 }
 void hDeleteIndex(Heap *h,int i)
 {
