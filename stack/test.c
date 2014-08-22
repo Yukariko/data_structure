@@ -1,7 +1,7 @@
-#define MAX_stack 10
+#define MAX_STACK 10
 typedef int DATA;
 typedef struct stack{DATA data;struct stack *next;}stack;
-stack *head[MAX_stack],*tail[MAX_stack];
+stack *head[MAX_STACK],*tail[MAX_STACK];
 void push(int index,DATA val)
 {
   stack *p=head[index];
