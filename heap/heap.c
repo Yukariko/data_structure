@@ -24,7 +24,7 @@ int hRightChild(Heap *h, int i)
   if(t>=h->count)return -1;
   return t;
 }
-hDATA hGetTopValue(Heap *h)
+hDATA hTop(Heap *h)
 {
   return h->arr[0];
 }
