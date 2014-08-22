@@ -1,21 +1,12 @@
-typedef int hDATA;
+typedef struct a{int x;double y;} hDATA;
 typedef struct Heap{
   hDATA *arr;
   int count;
   int capacity;
-  int heap_type;
+  int (*compare)(hDATA p,hDATA q);
 }Heap;
-#define MAX_HEAP 1
-#define MIN_HEAP 2
-Heap *CreateHeap(int capacity, int heap_type)
-{
-  Heap *h=(Heap *)malloc(sizeof(Heap));
-  h->count=0;
-  h->capacity=capacity;
-  h->heap_type=heap_type;
-  h->arr=(hDATA *)malloc(sizeof(hDATA)*capacity);
-  return h;
-}
+#define MAX_HEAP hMaxCompare
+#define MIN_HEAP hMinCompare
 int hParent(Heap *h, int i)
 {
   if(i<=0||i>=h->count)return -1;
@@ -33,52 +24,70 @@ int hRightChild(Heap *h, int i)
   if(t>=h->count)return -1;
   return t;
 }
-hDATA hTopValue(Heap *h)
+hDATA hGetTopValue(Heap *h)
 {
-  if(h->count==0) return -1;
   return h->arr[0];
 }
-int hCompare(Heap *h,hDATA p,hDATA q)
+int hMaxCompare(hDATA p,hDATA q)
 {
-  if(h->heap_type==MAX_HEAP)
-  {
-    return p>q;
-  }
-  else //MIN_HEAP
-  {
-    return p<q;
-  }
 }
-void hPercolateDown(Heap *h, int i)
+int hMinCompare(hDATA p,hDATA q)
+{
+}
+Heap *CreateHeap(int capacity, int (*compare)(hDATA p,hDATA q))
+{
+  Heap *h=(Heap *)malloc(sizeof(Heap));
+  h->count=0;
+  h->capacity=capacity;
+  h->compare=compare;
+  h->arr=(hDATA *)malloc(sizeof(hDATA)*capacity);
+  return h;
+}
+void DownHeap(Heap *h, int i)
 {
   int l,r,max;
   hDATA t;
   l=hLeftChild(h,i);
   r=hRightChild(h,i);
-  if(l!=-1&&hCompare(h,h->arr[l],h->arr[i]))max=l;
+  if(l!=-1&&h->compare(h->arr[l],h->arr[i]))max=l;
   else max=i;
-  if(r!=-1&&hCompare(h,h->arr[r],h->arr[max]))max=r;
+  if(r!=-1&&h->compare(h->arr[r],h->arr[max]))max=r;
   if(max!=i)
   {
     t=h->arr[i];
     h->arr[i]=h->arr[max];
     h->arr[max]=t;
-    hPercolateDown(h,max);
+    DownHeap(h,max);
   }
 }
-hDATA hDeleteTop(Heap *h)
+void UpHeap(Heap *h, int i)
 {
-  hDATA data;
-  if(h->count==0)return -1;
-  data=h->arr[0];
+  hDATA data=h->arr[i];
+  int p;
+  for(p=hParent(h,i);p!=-1&&h->compare(data,h->arr[p]);p=hParent(h,i))
+  {
+    h->arr[i]=h->arr[p];
+    i=p;
+  }
+  h->arr[i]=data;
+}
+void hDelete(Heap *h)
+{
+  if(h->count==0)return;
   h->arr[0]=h->arr[h->count-1];
   h->count--;
-  hPercolateDown(h,0);
-  return data;
+  DownHeap(h,0);
+}
+void hDeleteIndex(Heap *h,int i)
+{
+  if(h->count==0||i>=h->count)return;
+  h->arr[i]=h->arr[h->count-1];
+  h->count--;
+  UpHeap(h,i);
 }
 void ResizeHeap(Heap *h)
 {
-  int *arr_old=h->arr;
+  hDATA *arr_old=h->arr;
   int i;
   h->arr=(hDATA *)malloc(sizeof(hDATA)*h->capacity*2);
   for(i=0;i<h->capacity;i++)h->arr[i]=arr_old[i];
@@ -87,14 +96,9 @@ void ResizeHeap(Heap *h)
 }
 int hInsert(Heap *h, hDATA data)
 {
-  int i;
   if(h->count==h->capacity)ResizeHeap(h);
-  h->count++;
-  for(i=h->count-1;i>0&&hCompare(h,data,h->arr[(i-1)/2]);i=(i-1)/2)
-  {
-    h->arr[i]=h->arr[(i-1)/2];
-  }
-  h->arr[i]=data;
+  h->arr[h->count++]=data;
+  UpHeap(h,h->count-1);
 }
 void DestroyHeap(Heap *h)
 {
@@ -112,7 +116,7 @@ void BuildHeap(Heap *h,hDATA A[], int n)
     h->arr[i]=A[i];
   }
   h->count=n;
-  for(i=(n-1)/2;i>=0;i--)hPercolateDown(h,i);
+  for(i=(n-1)/2;i>=0;i--)DownHeap(h,i);
 }
 main()
 {
