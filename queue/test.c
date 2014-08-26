@@ -1,3 +1,27 @@
+typedef struct LinkedList{
+  qData data;
+  struct LinkedList *next;
+} LinkedList;
+typedef struct Queue{
+  LinkedList *head;
+  LinkedList *tail;
+} Queue;
+Queue *CreateQueue()
+{
+  Queue *q = (Queue *)malloc(sizeof(Queue));
+  q->head=(LinkedList *)malloc(sizeof(LinkedList));
+  q->head->next=0;
+  q->tail=q->head;
+  return q;
+}
+void qPush(Queue *q,qData data)
+{
+  q->tail->next=(LinkedList *)malloc(sizeof(LinkedList));
+  q->tail=q->tail->next;
+  q->tail->data=data;
+  q->tail->next=0;
+}
+
 #define MAX_QUEUE 10
 typedef int DATA;
 typedef struct queue{DATA data;struct queue *next;}queue;
