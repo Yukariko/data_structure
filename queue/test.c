@@ -1,3 +1,4 @@
+typedef int qData;
 typedef struct LinkedList{
   qData data;
   struct LinkedList *next;
@@ -19,7 +20,7 @@ Queue *CreateQueue()
 void qPush(Queue *q,qData data)
 {
   q->tail->data=data;
-  q->tail->next=(LinkedList *)malloc(sizeof(LinkedList));;
+  q->tail->next=(LinkedList *)malloc(sizeof(LinkedList));
   q->tail=q->tail->next;
   q->tail->next=0;
   q->count++;
