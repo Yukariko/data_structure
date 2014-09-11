@@ -30,9 +30,11 @@ hDATA hTop(Heap *h)
 }
 int hMaxCompare(hDATA p,hDATA q)
 {
+  return p>q;
 }
 int hMinCompare(hDATA p,hDATA q)
 {
+  return p<q;
 }
 Heap *CreateHeap(int capacity, int (*compare)(hDATA p,hDATA q))
 {
