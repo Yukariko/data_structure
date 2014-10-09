@@ -70,4 +70,8 @@ void pFree(Pack *p)
 }
 main()
 {
+  Pack *p = CreatePack(100,20);
+  int arr[5] = {1,43,20,35,70};
+  for(int i=0; i<5; i++) pInsert(p,arr[i]);
+  printf("%d %d\n",pFind(p , 3), pCount(p,35));
 }
