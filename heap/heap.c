@@ -125,5 +125,4 @@ void BuildHeap(Heap *h,hDATA A[], int n)
 }
 main()
 {
-  
 }
