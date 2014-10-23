@@ -25,10 +25,18 @@ void pInsert(Pack *p,int pos)
   p->pack[pos/p->packWidth]++;
   p->min=p->min > pos ? pos : p->min;
 }
-void pDelete(Pack *p,int pos)
+void pDelete(Pack *p,int pos,int opt)
 {
-  p->pack[pos/p->packWidth] -= p->arr[pos];
-  p->arr[pos]=0;
+  if(opt == 0) // all
+  {
+    p->pack[pos/p->packWidth] -= p->arr[pos];
+    p->arr[pos]=0;
+  }
+  else
+  {
+    p->pack[pos/p->packWidth]-=opt;
+    p->arr[pos]-=opt;
+  }
 }
 int pFind(Pack *p,int pos)
 {
