@@ -6,10 +6,10 @@ typedef int iData;
 
 typedef struct IndexTree
 {
-	iData **tree;
-	int start;
+	iData *tree;
 	int len;
-	int depth;
+	int size;
+	int start;
 } IndexTree;
 
 
@@ -18,106 +18,76 @@ iData ircmp(iData p, iData q);
 
 void iUpdate(IndexTree *idt, int idx)
 {
-	for(int i=idt->depth-1; i>=0; i--)
+	while(idx > 1)
 	{
 		idx >>= 1;
-		idt->tree[i][idx] = icmp(&idt->tree[i+1][idx<<1],&idt->tree[i+1][(idx<<1)+1]);
+		idt->tree[idx] = icmp(&idt->tree[idx<<1],&idt->tree[(idx<<1)+1]);
 	}
 }
 
 void iInsert(IndexTree *idt, int idx, iData data)
 {
-	idx -= idt->start;
-	idt->tree[idt->depth][idx] = data;
-	iUpdate(idt, idx);
-}
-
-iData iFind(IndexTree *idt, int depth, int idx, int start, int end)
-{
-	if(depth == idt->depth)
-		return idt->tree[depth][idx];
-	
-	int diff = idt->depth - depth;
-	if((start >> diff) < idx && idx < (end >> diff))
-		return idt->tree[depth][idx];
-
-	if((idx << 1) < (start >> (diff - 1)))
-		return iFind(idt, depth+1, (idx << 1) + 1, start, end);
-
-	if((idx << 1) + 1 > (end >> (diff - 1)))
-		return iFind(idt, depth+1, (idx << 1), start, end);
-
-	return ircmp(iFind(idt, depth+1, idx << 1, start, end),iFind(idt, depth+1, (idx << 1) + 1, start, end));
-}
-
-iData iGet(IndexTree *idt, int start, int end)
-{
-	start -= idt->start;
-	end -= idt->start;
-	return iFind(idt, 0, 0, start, end);
+	idx += idt->start;
+	idt->tree[idx] = data;
+	return iUpdate(idt, idx);
 }
 
 int iCount(IndexTree *idt, int count)
 {
-	int pos = 0;
-	for(int i=0; i < idt->depth; i++)
+	int start = 1, end = idt->start;
+	while(start < end)
 	{
-		for(int z=1 << i; pos < z; pos++)
+		start <<= 1;
+		if(idt->tree[start] < count)
 		{
-			if(idt->tree[i][pos] < count)
-				count -= idt->tree[i][pos];
-			else
-				break;
+			count -= idt->tree[start];
+			++start;
 		}
-		pos <<= 1;
 	}
-
-	for(;count > 0;)
-	{
-		if(idt->tree[idt->depth][pos] >= count)
-			return pos + idt->start;
-		else
-			count -= idt->tree[idt->depth][pos];
-		pos++;
-	}
-	return pos + idt->start;
+	return start - end + 1;
 }
 
 iData iTop(IndexTree *idt)
 {
-	return idt->tree[0][0];
+	return idt->tree[1];
 }
 
-IndexTree *CreateIndexTree(int start, int len, iData *init)
+void iMake(IndexTree *idt, int left)
+{
+	for(int i=left>>1; i>0; i>>=1)
+	{
+		int right = i << 1;
+		for(int j=i; j < right; j++)
+			idt->tree[j] = icmp(&idt->tree[j<<1],&idt->tree[(j<<1)+1]);
+	}
+}
+
+IndexTree *CreateIndexTree(int len, iData *init)
 {
 	IndexTree *idt = (IndexTree *)malloc(sizeof(IndexTree));
-	idt->start = start;
 	idt->len = len;
+	
+	idt->start = 1;
+	while(idt->start < idt->len)
+		idt->start <<= 1;
 
-	for(idt->depth=0; (1<<idt->depth) < idt->len;idt->depth++);
+	idt->size = idt->start << 1;
 
-	idt->tree = (iData **)malloc(sizeof(iData *) * idt->depth);
 
-	for(int i=0; i <= idt->depth; i++)
-		idt->tree[i] = (iData *)malloc(sizeof(iData) * (1 << i));
-
-	for(int i=0;i <= idt->depth; i++)
-		memset(idt->tree[i], 0, sizeof(iData) * (1 << i));
+	idt->tree = (iData *)malloc(sizeof(iData) * idt->size);
+	memset(idt->tree, 0, sizeof(iData) * idt->size);
 
 	if(init)
 	{
 		for(int i=0; i < idt->len; i++)
-			idt->tree[idt->depth][i] = init[i];
-		for(int i=0; i < idt->len; i++)
-			iUpdate(idt, i);
+			idt->tree[idt->start + i] = init[i];
+		iMake(idt, idt->start);
 	}
 	return idt;
 }
 
 void iDestroy(IndexTree *idt)
 {
-	for(int i=0;i<idt->depth;i++)
-		free(idt->tree[i]);
 	free(idt->tree);
 	free(idt);
 }
@@ -135,9 +105,9 @@ iData ircmp(iData p, iData q)
 int main()
 {
 	iData a[10] = {7,5,3,8,2,6,9,4,1,10};
-	IndexTree *idt = CreateIndexTree(0,10,a);
+	IndexTree *idt = CreateIndexTree(10,a);
 
 	printf("%d\n",iTop(idt));
-	printf("%d",iGet(idt,0,2));
+	iDestroy(idt);
 	return 0;
 }
