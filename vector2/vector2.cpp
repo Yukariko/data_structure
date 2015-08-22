@@ -4,9 +4,10 @@
 
 using namespace std;
 
+const double PI = 2.0 * acos(0.0);
+
 struct vector2
 {
-	const double PI = 2.0 * acos(0.0);
 	double x, y;
 
 	explicit vector2(double x = 0, double y = 0) : x(x), y(y) {}
@@ -70,6 +71,6 @@ struct vector2
 
 int main()
 {
-
+	vector2 v(2.0, 2.0);
 	return 0;
 }
