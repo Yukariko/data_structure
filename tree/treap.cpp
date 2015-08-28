@@ -6,7 +6,6 @@ using namespace std;
 template<typename KeyType>
 class treap
 {
-public:
 	struct Node
 	{
 		KeyType key;
@@ -35,10 +34,30 @@ public:
 				size += right->size;
 		}
 	};
-	typedef pair<Node*,Node*> NodePair;
+	Node *root;
+public:
 
 	treap() : root(NULL) {}
+	void insert(KeyType key)
+	{
+		Node *node = new Node(key);
+		root = insert(root, node);
+	}
+	void erase(KeyType key)
+	{
+		root = erase(root, key);
+	}
+	KeyType kth(int k)
+	{
+		return kth(root, k)->key;
+	}
+	int countLessThan(KeyType key)
+	{
+		return countLessThan(root, key);
+	}
 
+private:
+	typedef pair<Node*,Node*> NodePair;
 	NodePair split(Node *root, KeyType key)
 	{
 		if(root == NULL)
@@ -72,13 +91,6 @@ public:
 			root->setRight(insert(root->right, node));
 		return root;
 	}
-
-	void insert(KeyType key)
-	{
-		Node *node = new Node(key);
-		root = insert(root, node);
-	}
-
 	Node *merge(Node *a, Node *b)
 	{
 		if(a == NULL)
@@ -111,12 +123,6 @@ public:
 			root->setRight(erase(root->right, key));
 		return root;
 	}
-
-	void erase(KeyType key)
-	{
-		root = erase(root, key);
-	}
-
 	Node *kth(Node *root, int k)
 	{
 		int leftSize = 0;
@@ -128,12 +134,6 @@ public:
 			return root;
 		return kth(root->right, k - leftSize - 1);
 	}
-
-	KeyType kth(int k)
-	{
-		return kth(root, k)->key;
-	}
-
 	int countLessThan(Node *root, KeyType key)
 	{
 		if(root == NULL)
@@ -143,14 +143,6 @@ public:
 		int ls = (root->left? root->left->size : 0);
 		return ls + 1 + countLessThan(root->right, key);
 	}
-
-	int countLessThan(KeyType key)
-	{
-		return countLessThan(root, key);
-	}
-
-private:
-	Node *root;
 };
 
 int main()
